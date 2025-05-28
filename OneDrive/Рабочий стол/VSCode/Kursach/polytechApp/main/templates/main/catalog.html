@@ -4,24 +4,19 @@
 
 {% block extra_css %}
 <style>
-    /* Стили для витрины */
     .catalog {
         display: flex;
         margin-top: 20px;
     }
-    
-    /* Фильтры */
     .filters {
         width: 250px;
         padding-right: 20px;
         margin-right: 20px;
         border-right: 1px solid #eaeaea;
     }
-    
     .filter-section {
         margin-bottom: 25px;
     }
-    
     .filter-title {
         font-weight: 600;
         margin-bottom: 10px;
@@ -30,33 +25,26 @@
         justify-content: space-between;
         cursor: pointer;
     }
-    
     .filter-options {
         margin-top: 10px;
     }
-    
     .filter-option {
         margin-bottom: 8px;
         display: flex;
         align-items: center;
     }
-    
     .filter-option input {
         margin-right: 10px;
     }
-    
     .filter-option label {
         cursor: pointer;
     }
-    
-    /* Карточки проектов */
     .projects-grid {
         flex: 1;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
         gap: 20px;
     }
-    
     .project-card {
         background: white;
         border-radius: 8px;
@@ -65,29 +53,24 @@
         transition: transform 0.2s, box-shadow 0.2s;
         position: relative;
     }
-    
     .project-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
-    
     .project-image {
         height: 180px;
         overflow: hidden;
         position: relative;
     }
-    
     .project-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.3s;
     }
-    
     .project-card:hover .project-image img {
         transform: scale(1.05);
     }
-    
     .project-discount {
         position: absolute;
         top: 10px;
@@ -99,7 +82,6 @@
         font-size: 12px;
         font-weight: bold;
     }
-    
     .project-favorite {
         position: absolute;
         top: 10px;
@@ -113,47 +95,9 @@
         justify-content: center;
         cursor: pointer;
     }
-    
     .project-info {
         padding: 15px;
     }
-    
-    .project-price {
-        margin-top: 10px;
-    }
-    
-    .current-price {
-        font-weight: bold;
-        font-size: 18px;
-        color: #333;
-    }
-    
-    .old-price {
-        text-decoration: line-through;
-        color: #999;
-        font-size: 14px;
-        margin-left: 5px;
-    }
-    
-    .project-rating {
-        display: flex;
-        align-items: center;
-        margin-top: 5px;
-        font-size: 13px;
-        color: #666;
-    }
-    
-    .stars {
-        color: #FFC107;
-        margin-right: 5px;
-    }
-    
-    .project-sales {
-        margin-top: 5px;
-        font-size: 12px;
-        color: #999;
-    }
-    
     .add-to-cart {
         width: 100%;
         padding: 8px;
@@ -166,12 +110,9 @@
         font-weight: 500;
         transition: background 0.2s;
     }
-    
     .add-to-cart:hover {
         background: #6a9e34;
     }
-    
-    /* Сортировка */
     .sorting {
         display: flex;
         justify-content: space-between;
@@ -180,41 +121,33 @@
         padding-bottom: 15px;
         border-bottom: 1px solid #eaeaea;
     }
-    
     .sort-options {
         display: flex;
         gap: 15px;
     }
-    
     .sort-option {
         cursor: pointer;
         padding: 5px 10px;
         border-radius: 4px;
     }
-    
     .sort-option.active {
         background: #f2f2f2;
         font-weight: 500;
     }
-    
     .search-box {
         display: flex;
         align-items: center;
     }
-    
     .search-box input {
         padding: 8px 15px;
         border: 1px solid #ddd;
         border-radius: 4px;
         width: 250px;
     }
-    
-    /* Адаптивность */
     @media (max-width: 768px) {
         .catalog {
             flex-direction: column;
         }
-        
         .filters {
             width: 100%;
             border-right: none;
@@ -224,17 +157,14 @@
             padding-right: 0;
             margin-right: 0;
         }
-        
         .projects-grid {
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         }
-        
         .sorting {
             flex-direction: column;
             align-items: flex-start;
             gap: 10px;
         }
-        
         .search-box input {
             width: 100%;
         }
@@ -246,9 +176,6 @@
 <div class="sorting">
     <div class="sort-options">
         <div class="sort-option active">По популярности</div>
-        <div class="sort-option">По рейтингу</div>
-        <div class="sort-option">По цене ↑</div>
-        <div class="sort-option">По цене ↓</div>
         <div class="sort-option">По новизне</div>
     </div>
     <div class="search-box">
@@ -257,41 +184,32 @@
 </div>
 
 <div class="catalog">
-    <!-- Блок фильтров -->
     <div class="filters">
         <div class="filter-section">
             <div class="filter-title">Категории <span>+</span></div>
             <div class="filter-options">
+                {% for category in categories %}
                 <div class="filter-option">
-                    <input type="checkbox" id="cat1" checked>
-                    <label for="cat1">Веб-разработка</label>
+                    <input type="checkbox" id="cat{{ forloop.counter }}" name="category" value="{{ category.id }}">
+                    <label for="cat{{ forloop.counter }}">{{ category.name }}</label>
                 </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="cat2">
-                    <label for="cat2">Мобильные приложения</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="cat3">
-                    <label for="cat3">Дизайн</label>
-                </div>
-                <div class="filter-option">
-                    <input type="checkbox" id="cat4">
-                    <label for="cat4">Аналитика данных</label>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
-    
-    <!-- Блок проектов -->
     <div class="projects-grid">
         {% for project in projects %}
         <div class="project-card">
             <div class="project-image">
-                <img src="{{ project.image.url }}" alt="{{ project.title }}">
+                {% if project.main_image %}
+                <img src="{{ project.main_image.url }}" alt="{{ project.title }}">
+                {% else %}
+                <img src="/media/placeholder.jpg" alt="Нет изображения">
+                {% endif %}
             </div>
             <div class="project-info">
                 <h3>{{ project.title }}</h3>
-                <button class="add-to-cart">Записаться</button>
+                <a href="{% url 'project' project.id %}" class="add-to-cart">Подробнее</a>
             </div>
         </div>
         {% endfor %}
