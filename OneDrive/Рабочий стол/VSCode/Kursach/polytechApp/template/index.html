@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проектная деятельность | Главная</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo span {
+            color: #3498db;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #3498db;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://via.placeholder.com/1920x600') center/cover no-repeat;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+        
+        .hero-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .hero-content p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        /* О проектах */
+        .projects {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            color: #2c3e50;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 3px;
+            background-color: #3498db;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .project-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .project-img {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .project-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .project-card:hover .project-img img {
+            transform: scale(1.1);
+        }
+        
+        .project-info {
+            padding: 20px;
+        }
+        
+        .project-info h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .project-info p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        /* О нас */
+        .about {
+            padding: 80px 0;
+            background-color: #ecf0f1;
+        }
+        
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+        
+        .about-text {
+            flex: 1;
+        }
+        
+        .about-text h2 {
+            font-size: 36px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .about-text p {
+            margin-bottom: 15px;
+        }
+        
+        .about-image {
+            flex: 1;
+        }
+        
+        .about-image img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Контакты */
+        .contact {
+            padding: 80px 0;
+        }
+        
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            height: 150px;
+        }
+        
+        /* Подвал */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .footer-section p, .footer-section a {
+            color: #bdc3c7;
+            text-decoration: none;
+        }
+        
+        .footer-section a:hover {
+            color: #3498db;
+        }
+        
+        .copyright {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #34495e;
+            color: #bdc3c7;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 20px;
+            }
+            
+            .hero-content h1 {
+                font-size: 36px;
+            }
+            
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">Проектная<span>Деятельность</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#">Главная</a></li>    
+                    <li><a href="#">Витрина проектов</a></li>
+                    <li><a href="#">О проектной деятльности</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Герой-секция -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div>
+                <h1>Обучение через работу над реальными проектами</h1>
+                <p>Центр проектной деятельности Московского политеха позволяет студентам получить ценный опыт работы в команде.</p>
+                <a href="#" class="btn">Узнать больше</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- О проектах -->
+    <section class="projects">
+        <div class="container">
+            <div class="section-title">
+                <h2>Наши проекты</h2>
+            </div>
+            
+            <div class="projects-grid">
+                <!-- Проект 1 -->
+                <div class="project-card">
+                    <div class="project-img">
+                        <img src="https://via.placeholder.com/400x300" alt="Проект 1">
+                    </div>
+                    <div class="project-info">
+                        <h3>Образовательная платформа</h3>
+                        <p>Инновационная платформа для дистанционного обучения с использованием VR-технологий.</p>
+                        <div class="project-meta">
+                            <span>2023-2024</span>
+                            <span>Образование</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Проект 2 -->
+                <div class="project-card">
+                    <div class="project-img">
+                        <img src="https://via.placeholder.com/400x300" alt="Проект 2">
+                    </div>
+                    <div class="project-info">
+                        <h3>Экологический мониторинг</h3>
+                        <p>Система для отслеживания экологической обстановки в городской среде.</p>
+                        <div class="project-meta">
+                            <span>2022-2023</span>
+                            <span>Экология</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Проект 3 -->
+                <div class="project-card">
+                    <div class="project-img">
+                        <img src="https://via.placeholder.com/400x300" alt="Проект 3">
+                    </div>
+                    <div class="project-info">
+                        <h3>Социальная инициатива</h3>
+                        <p>Программа поддержки молодых предпринимателей в малых городах.</p>
+                        <div class="project-meta">
+                            <span>2021-2022</span>
+                            <span>Социальное</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- О нас -->
+    <section class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>О проектной деятельности</h2>
+                    <p>Проекты позволяют не только выстроить связь преподаваемых дисциплин с практикой, но и сформировать компетенции, которые требуют работодатели во всех сферах и отраслях: командная работа, междисциплинарность, ориентация на продукт и креативное мышление.</p>
+                    <a href="#" class="btn">Витрина проектов</a>
+                </div>
+                <div class="about-image">
+                    <img src="https://via.placeholder.com/600x400" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Подвал -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>О нас</h3>
+                    <p>Центр проектной деятельности МосПолитеха </p>
+                </div>
+                <div class="footer-section">
+                    <h3>Контакты</h3>
+                    <p>Email: info@project-team.ru</p>
+                    <p>Телефон: +7 (123) 456-78-90</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Быстрые ссылки</h3>
+                    <p><a href="#">Главная</a></p>
+                    <p><a href="#">Проекты</a></p>
+                    <p><a href="#">О нас</a></p>
+                    <p><a href="#">Контакты</a></p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; Московский Политехнический Университет 2025. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
