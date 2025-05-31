@@ -1,16 +1,19 @@
 from django.contrib import admin
-from . import models
+from .models import Project, Category, ProjectImage
 
-class ProjectImageInline(admin.TabularInline):
-    model = models.ProjectImage
-    extra = 1
-
+@admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'duration', 'created_at')
+    list_display = ('title', 'category', 'duration', 'created_at', 'updated_at')
     list_filter = ('category', 'created_at')
     search_fields = ('title', 'short_description')
-    inlines = [ProjectImageInline]
+    date_hierarchy = 'created_at'
 
-admin.site.register(models.Project, ProjectAdmin)
-admin.site.register(models.Category)
-admin.site.register(models.ProjectImage)
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+@admin.register(ProjectImage)
+class ProjectImageAdmin(admin.ModelAdmin):
+    list_display = ('project',)
+    list_filter = ('project',)

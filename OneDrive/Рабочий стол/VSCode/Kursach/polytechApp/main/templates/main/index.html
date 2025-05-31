@@ -1,11 +1,9 @@
-<DOCUMENT filename="templates/main/index.html">
 {% extends "base.html" %}
 
 {% block title %}Главная{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Стили для hero-секции */
     .hero {
         background: #f8f8f8;
         padding: 40px 20px;
@@ -27,7 +25,7 @@
     .hero a {
         display: inline-block;
         padding: 10px 20px;
-        background: #7BB33D;
+        background: #9a9a99;
         color: white;
         text-decoration: none;
         border-radius: 4px;
@@ -35,10 +33,9 @@
         transition: background 0.2s;
     }
     .hero a:hover {
-        background: #6a9e34;
+        background: #444544;
     }
 
-    /* Стили для секции преимуществ */
     .benefits {
         display: flex;
         justify-content: space-between;
@@ -62,11 +59,10 @@
         color: #666;
     }
 
-    /* Стили для сетки проектов */
     .projects-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 20px;
+        gap: 100px;
         margin-top: 20px;
     }
     .project-card {
@@ -100,7 +96,7 @@
     .add-to-cart {
         display: inline-block;
         padding: 8px 15px;
-        background: #7BB33D;
+        background: #9a9a99;
         color: white;
         text-decoration: none;
         border-radius: 4px;
@@ -108,10 +104,9 @@
         transition: background 0.2s;
     }
     .add-to-cart:hover {
-        background: #6a9e34;
+        background: #444544;
     }
 
-    /* Адаптивность */
     @media (max-width: 768px) {
         .hero h2 {
             font-size: 2em;
@@ -134,14 +129,12 @@
 
 {% block content %}
 <div class="content">
-    <!-- Hero-секция -->
     <div class="hero">
         <h2>Добро пожаловать в Центр проектной деятельности МосПолитеха</h2>
         <p>Мы объединяем студентов, преподавателей и индустриальных партнеров для создания инновационных проектов, которые решают реальные задачи.</p>
         <a href="{% url 'catalog' %}">Посмотреть проекты</a>
     </div>
 
-    <!-- Секция преимуществ -->
     <div class="benefits">
         <div class="benefit-card">
             <h3>Практический опыт</h3>
@@ -157,8 +150,7 @@
         </div>
     </div>
 
-    <!-- Секция популярных проектов -->
-    <h2>Популярные проекты</h2>
+    <h2>Некоторые из наших проектов</h2>
     <div class="projects-grid">
         {% for project in projects %}
         <div class="project-card">
@@ -181,4 +173,3 @@
     </div>
 </div>
 {% endblock %}
-</DOCUMENT>

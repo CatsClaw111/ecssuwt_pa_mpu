@@ -23,11 +23,11 @@ class ProjectImage(models.Model):
 
 class Project(models.Model):
     title = models.CharField(max_length=200, verbose_name="Название")
-    main_image = models.ImageField(upload_to='projects/images/', verbose_name="Основное изображение")
+    main_image = models.ImageField(upload_to='projects/images/', verbose_name="Основное изображение", blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name="Категория")
-    duration = models.IntegerField(verbose_name="Срок выполнения (дней)")
+    duration = models.PositiveIntegerField(verbose_name="Срок выполнения (семестры)")
     short_description = models.TextField(verbose_name="Краткое описание")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    created_at = models.DateTimeField(verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     
     def __str__(self):

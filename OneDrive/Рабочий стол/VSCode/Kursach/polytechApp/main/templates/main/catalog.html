@@ -71,30 +71,6 @@
     .project-card:hover .project-image img {
         transform: scale(1.05);
     }
-    .project-discount {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: #FF2D2D;
-        color: white;
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-    .project-favorite {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
     .project-info {
         padding: 15px;
     }
@@ -102,7 +78,7 @@
         width: 100%;
         padding: 8px;
         margin-top: 10px;
-        background: #7BB33D;
+        background: #9a9a99;
         color: white;
         border: none;
         border-radius: 4px;
@@ -111,7 +87,7 @@
         transition: background 0.2s;
     }
     .add-to-cart:hover {
-        background: #6a9e34;
+        background: #444544;
     }
     .sorting {
         display: flex;
@@ -175,11 +151,18 @@
 {% block content %}
 <div class="sorting">
     <div class="sort-options">
-        <div class="sort-option active">По популярности</div>
-        <div class="sort-option">По новизне</div>
+        <a href="?sort=popularity{% if selected_categories %}&{% for cat in selected_categories %}category={{ cat }}&{% endfor %}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" 
+           class="sort-option {% if sort == 'popularity' %}active{% endif %}">По популярности</a>
+        <a href="?sort=newest{% if selected_categories %}&{% for cat in selected_categories %}category={{ cat }}&{% endfor %}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" 
+           class="sort-option {% if sort == 'newest' %}active{% endif %}">По новизне</a>
     </div>
     <div class="search-box">
-        <input type="text" placeholder="Поиск проектов...">
+        <form method="GET" action="{% url 'catalog' %}">
+            <input type="text" name="q" placeholder="Поиск проектов..." value="{{ search_query }}">
+            <button type="submit" style="padding: 8px 15px; background: #7BB33D; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Найти
+            </button>
+        </form>
     </div>
 </div>
 
@@ -188,12 +171,20 @@
         <div class="filter-section">
             <div class="filter-title">Категории <span>+</span></div>
             <div class="filter-options">
-                {% for category in categories %}
-                <div class="filter-option">
-                    <input type="checkbox" id="cat{{ forloop.counter }}" name="category" value="{{ category.id }}">
-                    <label for="cat{{ forloop.counter }}">{{ category.name }}</label>
-                </div>
-                {% endfor %}
+                <form method="GET" action="{% url 'catalog' %}">
+                    {% for category in categories %}
+                    <div class="filter-option">
+                        <input type="checkbox" id="cat{{ forloop.counter }}" name="category" value="{{ category.id }}"
+                               {% if category.id|stringformat:"s" in selected_categories %}checked{% endif %}>
+                        <label for="cat{{ forloop.counter }}">{{ category.name }}</label>
+                    </div>
+                    {% endfor %}
+                    <input type="hidden" name="sort" value="{{ sort }}">
+                    <input type="hidden" name="q" value="{{ search_query }}">
+                    <button type="submit" style="margin-top: 10px; padding: 5px 10px; background: #7BB33D; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Применить
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -212,6 +203,8 @@
                 <a href="{% url 'project' project.id %}" class="add-to-cart">Подробнее</a>
             </div>
         </div>
+        {% empty %}
+        <p>Проекты по выбранным категориям не найдены.</p>
         {% endfor %}
     </div>
 </div>
