@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Витрина проектов{% endblock %}
+
+{% block extra_css %}
+<style>
+    .catalog {
+        display: flex;
+        margin-top: 20px;
+    }
+    .filters {
+        width: 250px;
+        padding-right: 20px;
+        margin-right: 20px;
+        border-right: 1px solid #eaeaea;
+    }
+    .filter-section {
+        margin-bottom: 25px;
+    }
+    .filter-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 16px;
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+    }
+    .filter-options {
+        margin-top: 10px;
+    }
+    .filter-option {
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
+    .filter-option input {
+        margin-right: 10px;
+    }
+    .filter-option label {
+        cursor: pointer;
+    }
+    .projects-grid {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+    .project-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+    }
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .project-image {
+        height: 180px;
+        overflow: hidden;
+        position: relative;
+    }
+    .project-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+    .project-card:hover .project-image img {
+        transform: scale(1.05);
+    }
+    .project-discount {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #FF2D2D;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .project-favorite {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    .project-info {
+        padding: 15px;
+    }
+    .add-to-cart {
+        width: 100%;
+        padding: 8px;
+        margin-top: 10px;
+        background: #7BB33D;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+    .add-to-cart:hover {
+        background: #6a9e34;
+    }
+    .sorting {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    .sort-options {
+        display: flex;
+        gap: 15px;
+    }
+    .sort-option {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+    .sort-option.active {
+        background: #f2f2f2;
+        font-weight: 500;
+    }
+    .search-box {
+        display: flex;
+        align-items: center;
+    }
+    .search-box input {
+        padding: 8px 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 250px;
+    }
+    @media (max-width: 768px) {
+        .catalog {
+            flex-direction: column;
+        }
+        .filters {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            padding-right: 0;
+            margin-right: 0;
+        }
+        .projects-grid {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        }
+        .sorting {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .search-box input {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sorting">
+    <div class="sort-options">
+        <div class="sort-option active">По популярности</div>
+        <div class="sort-option">По новизне</div>
+    </div>
+    <div class="search-box">
+        <input type="text" placeholder="Поиск проектов...">
+    </div>
+</div>
+
+<div class="catalog">
+    <div class="filters">
+        <div class="filter-section">
+            <div class="filter-title">Категории <span>+</span></div>
+            <div class="filter-options">
+                {% for category in categories %}
+                <div class="filter-option">
+                    <input type="checkbox" id="cat{{ forloop.counter }}" name="category" value="{{ category.id }}">
+                    <label for="cat{{ forloop.counter }}">{{ category.name }}</label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="projects-grid">
+        {% for project in projects %}
+        <div class="project-card">
+            <div class="project-image">
+                {% if project.main_image %}
+                <img src="{{ project.main_image.url }}" alt="{{ project.title }}">
+                {% else %}
+                <img src="/media/placeholder.jpg" alt="Нет изображения">
+                {% endif %}
+            </div>
+            <div class="project-info">
+                <h3>{{ project.title }}</h3>
+                <a href="{% url 'project' project.id %}" class="add-to-cart">Подробнее</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
