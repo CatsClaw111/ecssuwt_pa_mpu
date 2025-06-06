@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Личный кабинет преподавателя{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 800px;
+        margin: 20px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .dashboard-header h1 {
+        font-size: 2.2em;
+        color: #333;
+    }
+    .projects-list {
+        list-style: none;
+        padding: 0;
+    }
+    .project-item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        background: #fafafa;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+        transition: box-shadow 0.2s ease;
+    }
+    .project-item:hover {
+        box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
+    .project-item h2 {
+        margin-top: 0;
+        color: #444;
+    }
+    .project-info {
+        margin-top: 8px;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Личный кабинет преподавателя: {{ professor.user.username }}</h1>
+    </div>
+
+    {% if projects %}
+        <ul class="projects-list">
+            {% for project in projects %}
+            <li class="project-item">
+                <h2>{{ project.title }}</h2>
+                <div class="project-info">{{ project.short_description|truncatewords:30 }}</div>
+                <a href="{% url 'project' project.id %}">Подробнее</a>
+                <a href="{% url 'professor_project_work' project.id %}">Управление задачами</a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>У вас пока нет закреплённых проектов.</p>
+    {% endif %}
+</div>
+{% endblock %}

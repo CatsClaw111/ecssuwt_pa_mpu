@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Создать отчёт по задаче {{ task.title }}{% endblock %}
+
+{% block content %}
+<h1>Создать отчёт по задаче {{ task.number }} - {{ task.title }}</h1>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Отправить отчёт</button>
+</form>
+
+<a href="{% url 'project_work' task.project.id %}">Назад к проекту</a>
+{% endblock %}

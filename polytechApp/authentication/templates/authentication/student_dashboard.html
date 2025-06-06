@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Личный кабинет студента{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 800px;
+        margin: 20px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .dashboard-header h1 {
+        font-size: 2.2em;
+        color: #333;
+    }
+    /* Стили для кнопки входа */
+    .login-button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+    .login-button:hover {
+        background-color: #45a049;
+    }
+    .project-info {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        background: #fafafa;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+    .project-info h2 {
+        margin-top: 0;
+        color: #444;
+    }
+    .project-field {
+        margin-bottom: 12px;
+    }
+    .project-field strong {
+        display: inline-block;
+        width: 160px;
+        color: #666;
+    }
+    .no-project {
+        text-align: center;
+        color: #888;
+        font-style: italic;
+        padding: 40px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Личный кабинет студента: {{ student.user.username }}</h1>
+        <a href="{% url 'login' %}" class="login-button">Сменить пользователя</a>
+    </div>
+
+    {% if project %}
+    <div class="project-info">
+        <h2>Ваш проект: {{ project.title }}</h2>
+        <div class="project-field"><strong>Категория:</strong> {{ project.category.name }}</div>
+        <div class="project-field"><strong>Описание:</strong> {{ project.short_description }}</div>
+        <div class="project-field">
+            <strong>Длительность:</strong> {{ project.duration }} семестр{% if project.duration > 1 %}а{% endif %}
+        </div>
+        <div class="project-field">
+            <a href="{% url 'project_work' project.id %}">Перейти к проекту</a>
+            {% if project.main_image %}
+                <img src="{{ project.main_image.url }}" alt="{{ project.title }}" style="max-width:100%; border-radius: 6px; margin-top: 15px;">
+            {% else %}
+                <p><em>Изображение проекта отсутствует</em></p>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+        <p class="no-project">К вам не прикреплен проект.</p>
+    {% endif %}
+</div>
+{% endblock %}

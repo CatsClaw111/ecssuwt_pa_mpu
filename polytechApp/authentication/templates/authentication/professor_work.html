@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Проект: {{ project.title }} — Управление задачами{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f8fa;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h1, h2 {
+    color: #333;
+  }
+
+  p {
+    color: #555;
+    font-size: 16px;
+    max-width: 800px;
+    line-height: 1.5;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  thead {
+    background-color: #4a90e2;
+    color: white;
+  }
+
+  thead th {
+    padding: 12px 15px;
+    text-align: left;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s ease;
+  }
+
+  tbody tr:hover {
+    background-color: #f0f5fb;
+  }
+
+  tbody td {
+    padding: 12px 15px;
+    color: #444;
+  }
+
+  tbody td:first-child {
+    font-weight: 600;
+  }
+
+  td a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  td a:hover {
+    text-decoration: underline;
+  }
+
+  .btn-add-task {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+  }
+
+  .btn-add-task:hover {
+    background-color: #45a049;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    tbody tr {
+      margin-bottom: 20px;
+      border-bottom: 2px solid #4a90e2;
+      box-shadow: 0 0 10px rgba(74,144,226,0.2);
+      border-radius: 8px;
+      padding: 15px;
+      background: white;
+    }
+
+    tbody td {
+      padding-left: 50%;
+      position: relative;
+      text-align: right;
+      font-size: 14px;
+    }
+
+    tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 15px;
+      width: 45%;
+      padding-left: 10px;
+      font-weight: 600;
+      text-align: left;
+      color: #333;
+    }
+  }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<h1>{{ project.title }} — Управление задачами</h1>
+<p>{{ project.short_description }}</p>
+
+<h2>Задачи проекта</h2>
+
+<!-- Кнопка для добавления новой задачи -->
+<a href="" class="btn-add-task">Добавить задачу</a>
+
+{% if tasks %}
+<table>
+    <thead>
+        <tr>
+            <th>Название задачи</th>
+            <th>Описание</th>
+            <th>Исполнитель</th>
+            <th>Дедлайн</th>
+            <th>Статус</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.title }}</td>
+            <td>{{ task.description }}</td>
+            <td>{{ task.executor.user.username }}</td>
+            <td>{{ task.deadline }}</td>
+            <td>{{ task.get_status_display }}</td>
+            <td>
+                <a href="{% url 'task_edit' task.id %}">Редактировать</a> |
+                <a href="{% url 'task_create_report' task.id %}">Создать отчёт</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Задачи ещё не добавлены.</p>
+{% endif %}
+{% endblock %}
