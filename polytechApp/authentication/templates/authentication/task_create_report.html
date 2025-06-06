@@ -3,13 +3,56 @@
 {% block title %}Создать отчёт по задаче {{ task.title }}{% endblock %}
 
 {% block content %}
-<h1>Создать отчёт по задаче {{ task.number }} - {{ task.title }}</h1>
+<style>
+    .report-form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #f9f9f9;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Отправить отчёт</button>
-</form>
+    .report-form-container h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-<a href="{% url 'project_work' task.project.id %}">Назад к проекту</a>
+    .btn {
+        display: inline-block;
+        background-color: #9a9a99;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #444544;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    button[type="submit"] {
+        margin-top: 10px;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="report-form-container">
+    <h1>Создать отчёт по задаче {{ task.title }}</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Отправить отчёт</button>
+        <a href="{% url 'project_work' task.project.id %}" class="btn">Назад к проекту</a>
+    </form>
+</div>
 {% endblock %}

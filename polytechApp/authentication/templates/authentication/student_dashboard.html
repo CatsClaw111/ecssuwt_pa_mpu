@@ -25,7 +25,7 @@
         display: inline-block;
         margin-top: 10px;
         padding: 10px 20px;
-        background-color: #4CAF50;
+        background-color: #9a9a99;
         color: white;
         font-size: 16px;
         border: none;
@@ -34,7 +34,7 @@
         transition: background-color 0.3s ease;
     }
     .login-button:hover {
-        background-color: #45a049;
+        background-color: #444544;
     }
     .project-info {
         border: 1px solid #ddd;
@@ -61,6 +61,27 @@
         font-style: italic;
         padding: 40px 0;
     }
+    .btn-link {
+    display: inline-block;
+    background-color: #9a9a99;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    }
+
+    .btn-link:hover {
+        background-color: #444544;
+    }
+
+    .btn-link:active {
+        background-color: #333;
+    }
+
 </style>
 {% endblock %}
 
@@ -80,7 +101,7 @@
             <strong>Длительность:</strong> {{ project.duration }} семестр{% if project.duration > 1 %}а{% endif %}
         </div>
         <div class="project-field">
-            <a href="{% url 'project_work' project.id %}">Перейти к проекту</a>
+            <a href="{% url 'project_work' project.id %}" class="btn-link">Перейти к проекту</a>
             {% if project.main_image %}
                 <img src="{{ project.main_image.url }}" alt="{{ project.title }}" style="max-width:100%; border-radius: 6px; margin-top: 15px;">
             {% else %}

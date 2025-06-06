@@ -126,7 +126,7 @@ def task_create_report_view(request, task_id):
 
     # Проверка доступа: студент должен быть ответственным или преподаватель прикреплен к проекту
     if user.role == 'student':
-        if not hasattr(user, 'student') or user.student != task.responsible:
+        if not hasattr(user, 'student') or user.student != task.executor:
             return redirect('dashboard')
     elif user.role == 'professor':
         if task.project not in user.professor.projects.all():

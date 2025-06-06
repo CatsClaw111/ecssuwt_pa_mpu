@@ -13,11 +13,12 @@ class CustomUser(AbstractUser):
     
     def __str__(self):
         return self.username
+        
 
 class Student(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='student')
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
-    group_number = models.CharField(max_length=50, verbose_name="Номер группы", blank=True, null=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='student', verbose_name='Имя')
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True, related_name='students', verbose_name='Проект')
+    group_number = models.CharField(max_length=50, verbose_name="Номер группы")
     
     def __str__(self):
         return self.user.username
@@ -95,5 +96,5 @@ class Report(models.Model):
     file = models.FileField(upload_to='reports/')
 
     def __str__(self):
-        return f"Отчёт по задаче {self.task.number} ({self.task.title})"
+        return f"Отчёт по задаче ({self.task.title})"
 
