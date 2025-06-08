@@ -16,17 +16,30 @@ from django.http import JsonResponse
 from .models import Task
 from django.db import connection
 
+# authentication/views.py
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts      import render, redirect
+from django.contrib        import messages
+from .forms                import CustomLoginForm
+
 def login_view(request):
+    next_url = request.GET.get('next', 'dashboard')
+
     if request.method == 'POST':
         form = CustomLoginForm(request, data=request.POST)
         if form.is_valid():
-            user = form.cleaned_data['user']
-            print(f"User: {user.username}, Role in DB: {user.role}, Selected role: {form.cleaned_data['role']}")
+            # вместо form.cleaned_data['user'] — ещё раз аутентифицируем:
+            cd = form.cleaned_data
+            user = authenticate(
+                request,
+                username=cd['username'],
+                password=cd['password'],
+            )
+            # (форму мы уже проверили, так что user гарантированно не None и роль совпадает)
             login(request, user)
-            return redirect('home')
-        else:
-            print("Ошибки формы:", form.errors)
-            messages.error(request, "Ошибка авторизации. Проверьте данные.")
+            return redirect(next_url)
+
+        messages.error(request, "Ошибка авторизации. Проверьте имя, пароль и роль.")
     else:
         form = CustomLoginForm(request)
 
@@ -79,7 +92,7 @@ def dashboard_view(request):
 
     else:
         # Если роль не соответствует преподавателю или студенту, например, администратор
-        return render(request, 'authentication/default_dashboard.html', {'user': user})
+        return render(request, 'authentication/login.html', {'user': user})
 
 @login_required
 def project_work_view(request, project_id):
@@ -272,3 +285,19 @@ def update_task_status(request, task_id):
 def send_task_notification(task_id, new_status):
     # Логика для отправки уведомлений студентам и преподавателям
     print(f"Задача {task_id} была обновлена на статус: {new_status}")
+
+
+# в views.py
+from django.shortcuts import HttpResponse
+
+def debug_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return HttpResponse("УСПЕХ")
+        else:
+            print("AuthForm errors:", form.errors)
+    else:
+        form = AuthenticationForm(request)
+    return render(request, 'authentication/login.html', {'form': form})

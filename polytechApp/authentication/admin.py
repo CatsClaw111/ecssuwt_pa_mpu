@@ -1,15 +1,34 @@
 from django.contrib import admin
-from .models import (
-    CustomUser, Student, Professor, Task,
-    Schedule, Lesson, ProfProj, Report
-)
-
+from django.contrib.auth.admin import UserAdmin
+from .models import CustomUser, Student, Professor, Task, Schedule, Lesson, ProfProj, Report
 
 @admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'role', 'is_staff')
-    list_filter = ('role', 'is_staff', 'is_superuser')
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+
+    # какие колонки выводим в списке
+    list_display = ('username', 'email', 'role', 'is_staff', 'is_superuser', 'is_active')
+    list_filter  = ('role', 'is_staff', 'is_superuser', 'is_active')
+
+    # в какие секции разбита форма редактирования
+    fieldsets = (
+        (None,               {'fields': ('username', 'password')}),
+        ('Личные данные',    {'fields': ('first_name', 'last_name', 'email')}),
+        ('Разрешения',       {'fields': ('role', 'is_active', 'is_staff', 'is_superuser',
+                                         'groups', 'user_permissions')}),
+        ('Важные даты',      {'fields': ('last_login', 'date_joined')}),
+    )
+
+    # секция «Add user» — та самая, где спрашивает password1/password2
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'role', 'password1', 'password2'),
+        }),
+    )
+
     search_fields = ('username', 'email')
+    ordering     = ('username',)
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):

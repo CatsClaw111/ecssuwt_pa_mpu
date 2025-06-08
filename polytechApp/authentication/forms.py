@@ -5,7 +5,7 @@ from .models import Task
 from .models import Report  # создадим модель отчёта ниже
 
 class CustomLoginForm(forms.Form):
-    username = UsernameField(widget=forms.TextInput(attrs={"autofocus": True}))
+    username = UsernameField(label='Логин', widget=forms.TextInput(attrs={"autofocus": True}))
     password = forms.CharField(label="Пароль", strip=False, widget=forms.PasswordInput)
     role = forms.ChoiceField(
         choices=[('student', 'Студент'), ('professor', 'Преподаватель')],
@@ -16,22 +16,19 @@ class CustomLoginForm(forms.Form):
         self.request = request
         super().__init__(*args, **kwargs)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        username = cleaned_data.get("username")
-        password = cleaned_data.get("password")
-        role = cleaned_data.get("role")
+def clean(self):
+    cleaned = super().clean()
+    username = cleaned.get("username")
+    password = cleaned.get("password")
+    role     = cleaned.get("role")
+    print("→ clean():", {"username":username, "password":password, "role":role})
 
-        user = authenticate(request=self.request, username=username, password=password)
+    user = authenticate(request=self.request,
+                        username=username,
+                        password=password)
+    print("→ authenticate →", user)
+    ...
 
-        if user is None:
-            raise forms.ValidationError("Неверное имя пользователя или пароль.")
-
-        if user.role != role:
-            raise forms.ValidationError("Выбранная роль не соответствует вашей учетной записи.")
-
-        cleaned_data['user'] = user
-        return cleaned_data
 
 # authentication/forms.py
 
