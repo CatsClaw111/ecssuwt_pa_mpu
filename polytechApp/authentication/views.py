@@ -15,34 +15,21 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from .models import Task
 from django.db import connection
-
-# authentication/views.py
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts      import render, redirect
-from django.contrib        import messages
-from .forms                import CustomLoginForm
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import CustomLoginForm
 
 def login_view(request):
     next_url = request.GET.get('next', 'dashboard')
-
     if request.method == 'POST':
         form = CustomLoginForm(request, data=request.POST)
         if form.is_valid():
-            # вместо form.cleaned_data['user'] — ещё раз аутентифицируем:
-            cd = form.cleaned_data
-            user = authenticate(
-                request,
-                username=cd['username'],
-                password=cd['password'],
-            )
-            # (форму мы уже проверили, так что user гарантированно не None и роль совпадает)
-            login(request, user)
+            login(request, form.get_user())
             return redirect(next_url)
-
-        messages.error(request, "Ошибка авторизации. Проверьте имя, пароль и роль.")
+        messages.error(request, "Неверный логин или пароль.")
     else:
         form = CustomLoginForm(request)
-
     return render(request, 'authentication/login.html', {'form': form})
 
 def logout_view(request):

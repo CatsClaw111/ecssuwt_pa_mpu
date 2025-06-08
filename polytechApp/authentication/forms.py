@@ -1,20 +1,21 @@
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.forms import UsernameField
+from django.contrib.auth.forms import AuthenticationForm, UsernameField
 from .models import Task
 from .models import Report  # создадим модель отчёта ниже
 
-class CustomLoginForm(forms.Form):
-    username = UsernameField(label='Логин', widget=forms.TextInput(attrs={"autofocus": True}))
-    password = forms.CharField(label="Пароль", strip=False, widget=forms.PasswordInput)
-    role = forms.ChoiceField(
-        choices=[('student', 'Студент'), ('professor', 'Преподаватель')],
-        label="Роль"
+
+class CustomLoginForm(AuthenticationForm):
+    username = UsernameField(
+        label='Логин',
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
+    password = forms.CharField(
+        label='Пароль',
+        strip=False,
+        widget=forms.PasswordInput
     )
 
-    def __init__(self, request=None, *args, **kwargs):
-        self.request = request
-        super().__init__(*args, **kwargs)
 
 def clean(self):
     cleaned = super().clean()

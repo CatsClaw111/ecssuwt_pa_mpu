@@ -89,7 +89,6 @@
                 {% csrf_token %}
                 {{ form.username.label_tag }} {{ form.username }}
                 {{ form.password.label_tag }} {{ form.password }}
-                {{ form.role.label_tag }} {{ form.role }}
                 <button type="submit">Войти</button>
             </form>
             {% if messages %}
