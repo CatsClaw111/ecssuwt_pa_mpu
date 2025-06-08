@@ -1,20 +1,20 @@
+{# authentication/templates/authentication/student_work.html #}
 {% extends "base.html" %}
 
-{% block title %}Проект: {{ project.title }} — Управление задачами{% endblock %}
+{% block title %}
+  Проект: {{ project.title }} — Мои задачи
+{% endblock %}
 
 {% block extra_css %}
 <style>
+  /* Общее */
   body {
     font-family: Arial, sans-serif;
     background-color: #f7f8fa;
     margin: 0;
     padding: 20px;
   }
-
-  h1, h2 {
-    color: #333;
-  }
-
+  h1, h2 { color: #333; }
   p {
     color: #555;
     font-size: 16px;
@@ -22,51 +22,81 @@
     line-height: 1.5;
   }
 
+  /* Карточка заголовка проекта */
+  .project-header {
+    background: #fff;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+  .project-header h1 {
+    font-size: 28px;
+    margin: 0;
+    color: #2c3e50;
+  }
+  .project-header p {
+    margin: 8px 0 0;
+    color: #666;
+    font-size: 16px;
+  }
+
+  /* Карточка списка задач */
+  .task-section {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+  }
+  .task-section-header {
+    margin-bottom: 15px;
+  }
+  .task-section-header h2 {
+    font-size: 20px;
+    color: #333;
+    margin: 0;
+  }
+
+  /* Таблица */
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 25px;
     background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
-
   thead {
     background-color: #4a90e2;
     color: white;
   }
-
   thead th {
     padding: 12px 15px;
     text-align: left;
   }
-
   tbody tr {
     border-bottom: 1px solid #ddd;
     transition: background-color 0.3s ease;
   }
-
   tbody tr:hover {
     background-color: #f0f5fb;
   }
-
   tbody td {
     padding: 12px 15px;
     color: #444;
   }
-
   tbody td:first-child {
     font-weight: 600;
   }
 
+  /* Кнопки «Отправить отчёт» */
   td form {
     display: inline;
   }
-
   td form button {
     padding: 8px 15px;
-    background-color: #9a9a99;
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
@@ -74,33 +104,22 @@
     font-weight: 500;
     transition: background-color 0.3s ease;
   }
-
   td form button:hover {
-    background-color: #444544;
+    background-color: #45a049;
   }
-
   td form button:active {
     transform: scale(0.98);
-  }
-
-  .error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 10px;
-    text-align: center;
   }
 
   @media (max-width: 768px) {
     table, thead, tbody, th, td, tr {
       display: block;
     }
-
     thead tr {
       position: absolute;
       top: -9999px;
       left: -9999px;
     }
-
     tbody tr {
       margin-bottom: 20px;
       border-bottom: 2px solid #4a90e2;
@@ -109,14 +128,12 @@
       padding: 15px;
       background: white;
     }
-
     tbody td {
       padding-left: 50%;
       position: relative;
       text-align: right;
       font-size: 14px;
     }
-
     tbody td::before {
       content: attr(data-label);
       position: absolute;
@@ -128,47 +145,71 @@
       color: #333;
     }
   }
+
+  thead a,
+  thead a:visited,
+  thead a:hover,
+  thead a:active {
+    color: #fff !important;
+    text-decoration: none !important;
+    cursor: pointer;
+  }
+
 </style>
 {% endblock %}
 
-
 {% block content %}
-<h1>{{ project.title }} — Управление задачами</h1>
-<p>{{ project.short_description }}</p>
+  <div class="project-header">
+    <h1>{{ project.title }}</h1>
+    <p>{{ project.short_description }}</p>
+  </div>
 
-<h2>Задачи проекта</h2>
-{% if tasks %}
-<table>
-    <thead>
-        <tr>
-            <th>Название задачи</th>
-            <th>Описание</th>
-            <th>Исполнитель</th>
-            <th>Дедлайн</th>
-            <th>Статус</th>
-            <th>Отчёт</th> <!-- Добавляем столбец для кнопки отправки -->
-        </tr>
-    </thead>
-    <tbody>
-        {% for task in tasks %}
-        <tr>
-            <td>{{ task.title }}</td>
-            <td>{{ task.description }}</td>
-            <td>{{ task.executor.user.username }}</td>
-            <td>{{ task.deadline }}</td>
-            <td>{{ task.get_status_display }}</td>
-            <td>
-                <!-- Форма для отправки отчёта к каждой задаче -->
-                <form method="POST" action="{% url 'task_create_report' task.id %}">
-                    {% csrf_token %}
-                    <button type="submit">Отправить</button> <!-- Кнопка отправить для каждой задачи -->
+  <div class="task-section">
+    <div class="task-section-header">
+      <h2>Задачи проекта</h2>
+    </div>
+
+    {% if tasks %}
+      <table>
+        <thead>
+          <tr>
+            {# выводим динамические колонки со ссылками sort=… #}
+            {% for col,label in columns %}
+              {% with asc=col desc='-'|add:col %}
+                <th>
+                  {% if current_sort == asc %}
+                    <a href="?sort={{ desc }}">{{ label }} ▲</a>
+                  {% elif current_sort == desc %}
+                    <a href="?sort={{ asc }}">{{ label }} ▼</a>
+                  {% else %}
+                    <a href="?sort={{ asc }}">{{ label }}</a>
+                  {% endif %}
+                </th>
+              {% endwith %}
+            {% endfor %}
+            <th>Отчёт</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+            <tr>
+              <td data-label="Название задачи">{{ task.title }}</td>
+              <td data-label="Описание">{{ task.description }}</td>
+              <td data-label="Исполнитель">{{ task.executor.user.username }}</td>
+              <td data-label="Дедлайн">{{ task.deadline }}</td>
+              <td data-label="Статус">{{ task.get_status_display }}</td>
+              <td data-label="Отчёт">
+                <form method="post" action="{% url 'task_create_report' task.id %}">
+                  {% csrf_token %}
+                  <button type="submit">Отправить</button>
                 </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>Задачи ещё не добавлены.</p>
-{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Задачи ещё не назначены.</p>
+    {% endif %}
+  </div>
 {% endblock %}

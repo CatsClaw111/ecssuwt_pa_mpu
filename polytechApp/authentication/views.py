@@ -77,19 +77,42 @@ def dashboard_view(request):
 def project_work_view(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
-    # execute_query()
-
-    # Проверяем, что студент прикреплён к этому проекту
+    # Доступ студента
     user = request.user
     if user.role != 'student' or not hasattr(user, 'student') or user.student.project != project:
-        # Не даём доступ, можно редирект или страница с ошибкой
         return render(request, 'authentication/no_access.html')
 
-    tasks = project.tasks.all().order_by('id')  # или сортируй по нужному полю
+    # Настройки сортировки
+    allowed = {
+        'title':       'title',
+        'description': 'description',
+        'executor':    'executor__user__username',
+        'deadline':    'deadline',
+        'status':      'status',
+    }
+    sort = request.GET.get('sort', 'deadline')
+    desc = sort.startswith('-')
+    key = sort.lstrip('-')
+    field = allowed.get(key, allowed['deadline'])
+    order = ('-' if desc else '') + field
+
+    # Выбираем задачи и сортируем
+    tasks = project.tasks.select_related('executor__user').order_by(order)
+
+    # Передаём колоноки, выборку и текущий сорт
+    columns = [
+        ('title',       'Название задачи'),
+        ('description', 'Описание'),
+        ('executor',    'Исполнитель'),
+        ('deadline',    'Дедлайн'),
+        ('status',      'Статус'),
+    ]
 
     return render(request, 'authentication/project_work.html', {
-        'project': project,
-        'tasks': tasks,
+        'project':      project,
+        'tasks':        tasks,
+        'columns':      columns,
+        'current_sort': sort,
     })
 
 @login_required
