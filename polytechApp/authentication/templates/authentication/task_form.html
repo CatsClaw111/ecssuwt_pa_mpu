@@ -1,7 +1,8 @@
-{# yourapp/templates/yourapp/task_edit.html #}
 {% extends "base.html" %}
 
-{% block title %}Редактировать задачу{% endblock %}
+{% block title %}
+  {% if form.instance.pk %}Редактировать задачу{% else %}Добавить задачу{% endif %}
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -84,11 +85,15 @@
 
 {% block content %}
   <div class="form-container">
-    <h1>Редактировать задачу</h1>
+    <h1>
+      {% if form.instance.pk %}Редактировать задачу{% else %}Добавить задачу{% endif %}
+    </h1>
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit" class="btn-submit">Сохранить</button>
+      <button type="submit" class="btn-submit">
+        {% if form.instance.pk %}Сохранить{% else %}Добавить{% endif %}
+      </button>
       <a href="{% url 'professor_project_work' project.id %}" class="btn-cancel">Отмена</a>
     </form>
   </div>

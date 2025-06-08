@@ -31,7 +31,6 @@ def clean(self):
     ...
 
 
-# authentication/forms.py
 
 User = get_user_model()
 
@@ -39,15 +38,18 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'executor', 'deadline', 'status']
+        widgets = {
+            # указываем формат ISO, чтобы value="YYYY-MM-DD" подхватывался браузером
+            'deadline': forms.DateInput(format='%Y-%m-%d', attrs={
+                'type': 'date',
+            }),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Поле executor - только преподаватели из модели Professor
-        # Если хочешь, можно ограничить queryset для executor здесь
-        # Например:
-        # self.fields['executor'].queryset = Professor.objects.all()
-        self.fields['deadline'].widget = forms.DateInput(attrs={'type': 'date'})
-
+        # если передан instance (режим редактирования), вручную положим initial
+        if self.instance and self.instance.pk:
+            self.fields['deadline'].initial = self.instance.deadline.strftime('%Y-%m-%d')
 
 # authentication/forms.py
 

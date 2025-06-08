@@ -9,16 +9,8 @@ from django.http import HttpResponseRedirect
 from .forms import CustomLoginForm, ReportForm, TaskForm
 from django.db import connection
 from time import timezone
-# Create your views here.
-
-from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import Task
-from django.db import connection
-from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import CustomLoginForm
+from django.core.exceptions import PermissionDenied
 
 def login_view(request):
     next_url = request.GET.get('next', 'dashboard')
@@ -101,23 +93,51 @@ def project_work_view(request, project_id):
     })
 
 @login_required
-def task_edit_view(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
+def task_create(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.project = project
+            task.save()
+            return redirect('professor_project_work', project_id=project.id)
+    else:
+        form = TaskForm()
+    return render(request, 'authentication/task_form.html', {
+        'form': form,
+        'project': project,
+    })
 
-    # Проверка, что пользователь преподаватель и прикреплен к проекту задачи
-    user = request.user
-    if user.role != 'professor' or task.project not in user.professor.projects.all():
-        return redirect('dashboard')
 
+@login_required
+def task_edit(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    project = task.project
     if request.method == 'POST':
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
-            return redirect('project_work', project_id=task.project.id)
+            return redirect('professor_project_work', project_id=project.id)
     else:
         form = TaskForm(instance=task)
+    return render(request, 'authentication/task_form.html', {
+        'form': form,
+        'project': project,
+        'task': task,
+    })
 
-    return render(request, 'authentication/task_edit.html', {'form': form, 'task': task})
+@login_required
+def task_delete(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    project = task.project
+    if request.method == 'POST':
+        task.delete()
+        return redirect('professor_project_work', project_id=project.id)
+    return render(request, 'authentication/task_confirm_delete.html', {
+        'task': task,
+    })
+
 
 @login_required
 def task_create_report_view(request, task_id):
@@ -148,26 +168,45 @@ def task_create_report_view(request, task_id):
 
 @login_required
 def professor_project_work_view(request, project_id):
-    # Получаем преподавателя
     professor = request.user.professor
-
-    # Получаем проект через связку ProfProj
     project = get_object_or_404(Project, id=project_id)
 
-    # Проверяем, что проект принадлежит преподавателю
     if not ProfProj.objects.filter(professor=professor, project=project).exists():
-        # Если проект не привязан к преподавателю, редиректим или показываем ошибку
-        return render(request, 'authentication/error.html', {'message': 'Проект не найден для данного преподавателя'})
+        return render(request, 'authentication/error.html', {
+            'message': 'Проект не найден для данного преподавателя'
+        })
 
-    # Получаем задачи для проекта
-    tasks = project.tasks.all()  # Список задач для данного проекта
+    # Настройки для сортировки
+    allowed = {
+        'title':       'title',
+        'description': 'description',
+        'executor':    'executor__user__username',
+        'deadline':    'deadline',
+        'status':      'status',
+    }
+    sort = request.GET.get('sort', 'deadline')
+    desc = sort.startswith('-')
+    key = sort.lstrip('-')
+    field = allowed.get(key, allowed['deadline'])
+    order = ('-' if desc else '') + field
+
+    tasks = project.tasks.select_related('executor__user').order_by(order)
+
+    columns = [
+        ('title',       'Название задачи'),
+        ('description', 'Описание'),
+        ('executor',    'Исполнитель'),
+        ('deadline',    'Дедлайн'),
+        ('status',      'Статус'),
+    ]
 
     context = {
-        'professor': professor,
-        'project': project,
-        'tasks': tasks,
+        'professor':    professor,
+        'project':      project,
+        'tasks':        tasks,
+        'current_sort': sort,
+        'columns': columns,
     }
-
     return render(request, 'authentication/professor_work.html', context)
 
 
@@ -274,17 +313,20 @@ def send_task_notification(task_id, new_status):
     print(f"Задача {task_id} была обновлена на статус: {new_status}")
 
 
-# в views.py
-from django.shortcuts import HttpResponse
 
-def debug_login(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            login(request, form.get_user())
-            return HttpResponse("УСПЕХ")
-        else:
-            print("AuthForm errors:", form.errors)
-    else:
-        form = AuthenticationForm(request)
-    return render(request, 'authentication/login.html', {'form': form})
+
+
+
+# from django.shortcuts import HttpResponse
+
+# def debug_login(request):
+#     if request.method == 'POST':
+#         form = AuthenticationForm(request, data=request.POST)
+#         if form.is_valid():
+#             login(request, form.get_user())
+#             return HttpResponse("УСПЕХ")
+#         else:
+#             print("AuthForm errors:", form.errors)
+#     else:
+#         form = AuthenticationForm(request)
+#     return render(request, 'authentication/login.html', {'form': form})

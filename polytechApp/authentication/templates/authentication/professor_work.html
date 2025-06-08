@@ -1,6 +1,9 @@
+{# authentication/templates/authentication/professor_work.html #}
 {% extends "base.html" %}
 
-{% block title %}Проект: {{ project.title }} — Управление задачами{% endblock %}
+{% block title %}
+  Проект: {{ project.title }} — Управление задачами
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -22,12 +25,29 @@
     line-height: 1.5;
   }
 
+  .btn-add-task {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.3s;
+    cursor: pointer;
+  }
+  .btn-add-task:hover {
+    background-color: #45a049;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 25px;
     background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     border-radius: 8px;
     overflow: hidden;
   }
@@ -36,7 +56,6 @@
     background-color: #4a90e2;
     color: white;
   }
-
   thead th {
     padding: 12px 15px;
     text-align: left;
@@ -46,7 +65,6 @@
     border-bottom: 1px solid #ddd;
     transition: background-color 0.3s ease;
   }
-
   tbody tr:hover {
     background-color: #f0f5fb;
   }
@@ -55,7 +73,6 @@
     padding: 12px 15px;
     color: #444;
   }
-
   tbody td:first-child {
     font-weight: 600;
   }
@@ -65,47 +82,19 @@
     text-decoration: none;
     font-weight: bold;
   }
-
   td a:hover {
     text-decoration: underline;
-  }
-
-  .btn-add-task {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 20px;
-    display: inline-block;
-    transition: background-color 0.3s ease;
-    text-decoration: none;
-  }
-
-  .btn-add-task:hover {
-    background-color: #45a049;
-  }
-
-  .error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 10px;
-    text-align: center;
   }
 
   @media (max-width: 768px) {
     table, thead, tbody, th, td, tr {
       display: block;
     }
-
     thead tr {
       position: absolute;
       top: -9999px;
       left: -9999px;
     }
-
     tbody tr {
       margin-bottom: 20px;
       border-bottom: 2px solid #4a90e2;
@@ -114,14 +103,12 @@
       padding: 15px;
       background: white;
     }
-
     tbody td {
       padding-left: 50%;
       position: relative;
       text-align: right;
       font-size: 14px;
     }
-
     tbody td::before {
       content: attr(data-label);
       position: absolute;
@@ -133,48 +120,106 @@
       color: #333;
     }
   }
+
+  thead a,
+  thead a:visited,
+  thead a:hover,
+  thead a:active {
+    color: #fff !important;           /* белый цвет */
+    text-decoration: none !important; /* без подчёркивания */
+    cursor: pointer;                  /* курсор «рука» */
+  }
+  .project-header {
+    background: #fff;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+
+  .project-header h1 { font-size:28px; margin:0; color:#2c3e50; }
+  .project-header p  { margin:8px 0 0; color:#666; font-size:16px; }
+
+  .task-section {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .task-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .task-section-header h2 {
+    font-size: 20px;
+    color: #333;
+    margin: 0;
+  }
+
+  .task-section-header .btn-add-task {
+    margin: 0;
+  }
+
 </style>
 {% endblock %}
 
-
 {% block content %}
-<h1>{{ project.title }} — Управление задачами</h1>
-<p>{{ project.short_description }}</p>
+  <div class="project-header">
+    <h1>{{ project.title }}</h1>
+    <p>{{ project.short_description }}</p>
+  </div>
 
-<h2>Задачи проекта</h2>
+  <div class="task-section">
+    <div class="task-section-header">
+      <h2>Задачи проекта</h2>
+      <a href="{% url 'task_create' project.id %}" class="btn-add-task">
+        Добавить задачу
+      </a>
+    </div>
 
-<!-- Кнопка для добавления новой задачи -->
-<a href="" class="btn-add-task">Добавить задачу</a>
-
-{% if tasks %}
-<table>
-    <thead>
-        <tr>
-            <th>Название задачи</th>
-            <th>Описание</th>
-            <th>Исполнитель</th>
-            <th>Дедлайн</th>
-            <th>Статус</th>
+    {% if tasks %}
+      <table>
+        <thead>
+          <tr>
+            {% for col,label in columns %}
+              {% with asc=col desc='-'|add:col %}
+                <th>
+                  {% if current_sort == asc %}
+                    <a href="?sort={{ desc }}">{{ label }} ▲</a>
+                  {% elif current_sort == desc %}
+                    <a href="?sort={{ asc }}">{{ label }} ▼</a>
+                  {% else %}
+                    <a href="?sort={{ asc }}">{{ label }}</a>
+                  {% endif %}
+                </th>
+              {% endwith %}
+            {% endfor %}
             <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for task in tasks %}
-        <tr>
-            <td>{{ task.title }}</td>
-            <td>{{ task.description }}</td>
-            <td>{{ task.executor.user.username }}</td>
-            <td>{{ task.deadline }}</td>
-            <td>{{ task.get_status_display }}</td>
-            <td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+            <tr>
+              <td data-label="Название задачи">{{ task.title }}</td>
+              <td data-label="Описание">{{ task.description }}</td>
+              <td data-label="Исполнитель">{{ task.executor.user.username }}</td>
+              <td data-label="Дедлайн">{{ task.deadline }}</td>
+              <td data-label="Статус">{{ task.get_status_display }}</td>
+              <td data-label="Действия">
                 <a href="{% url 'task_edit' task.id %}">Редактировать</a> |
-                <a href="{% url 'task_create_report' task.id %}">Создать отчёт</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>Задачи ещё не добавлены.</p>
-{% endif %}
+                <a href="{% url 'task_delete' task.id %}">Удалить</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Задачи ещё не добавлены.</p>
+    {% endif %}
+  </div>
 {% endblock %}
