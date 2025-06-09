@@ -1,13 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from main.models import Project
 from .models import Student, Professor, Task, ProfProj
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
 from .forms import CustomLoginForm, ReportForm, TaskForm
 from django.db import connection
+from django.db.models import Count, Q
 from time import timezone
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
@@ -230,6 +229,14 @@ def professor_project_work_view(request, project_id):
         'current_sort': sort,
         'columns': columns,
     }
+    
+    stats = project.tasks.aggregate(
+        total=Count('id'),
+        pending=Count('id', filter=Q(status='pending')),
+        done=Count('id', filter=Q(status='completed')),
+    )
+    context['stats'] = stats
+
     return render(request, 'authentication/professor_work.html', context)
 
 
