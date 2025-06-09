@@ -1,15 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from main.models import Project
-from .models import Student, Professor, Task, ProfProj
+from .models import Task, ProfProj
 from .forms import CustomLoginForm, ReportForm, TaskForm
 from django.db import connection
 from django.db.models import Count, Q
 from time import timezone
 from django.http import JsonResponse
 from datetime import date, timedelta
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+
 
 def login_view(request):
     next_url = request.GET.get('next', 'dashboard')
@@ -202,26 +204,25 @@ def professor_project_work_view(request, project_id):
     professor = request.user.professor
     project = get_object_or_404(Project, id=project_id)
 
-    # Проверка доступа
     if not ProfProj.objects.filter(professor=professor, project=project).exists():
         return render(request, 'authentication/error.html', {
             'message': 'Проект не найден для данного преподавателя'
         })
 
-    # === Виджет 1: статистика по задачам ===
+    # Виджет 1: статистика по задачам
     stats = project.tasks.aggregate(
         total=Count('id'),
         pending=Count('id', filter=Q(status='pending')),
         done=Count('id', filter=Q(status='completed')),
     )
 
-    # === Виджет 2: ближайшие дедлайны (на неделю) ===
+    # Виджет 2: ближайшие дедлайны на неделю вперед
     today = date.today()
     upcoming = project.tasks.filter(
         deadline__range=(today, today + timedelta(days=7))
     ).order_by('deadline')[:5]
 
-    # === Основная таблица задач (сортировка) ===
+    # Базовый QuerySet задач и сортировка
     allowed = {
         'title':       'title',
         'description': 'description',
@@ -237,6 +238,30 @@ def professor_project_work_view(request, project_id):
 
     tasks = project.tasks.select_related('executor__user').order_by(order)
 
+    # Виджет 3: полнотекстовый поиск по заголовку и описанию
+    q = request.GET.get('q', '').strip()
+    if q:
+        vector = (
+            SearchVector('title', weight='A', config='russian') +
+            SearchVector('description', weight='B', config='russian')
+        )
+        query  = SearchQuery(q, config='russian')
+        tasks = tasks.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.1).order_by('-rank')
+
+    # Виджет 4: проект в зоне риска
+    overdue_count = project.tasks.filter(
+        status='pending',
+        deadline__lt=today
+    ).count()
+
+    percent_done = (
+        (stats['done'] / stats['total'] * 100)
+        if stats['total'] else 0
+    )
+    RISK_THRESHOLD = 70
+    is_risky = percent_done < RISK_THRESHOLD
+
+    # Список колонок для таблицы
     columns = [
         ('title',       'Название задачи'),
         ('description', 'Описание'),
@@ -245,8 +270,7 @@ def professor_project_work_view(request, project_id):
         ('status',      'Статус'),
     ]
 
-    # Собираем контекст
-    context = {
+    return render(request, 'authentication/professor_work.html', {
         'professor':    professor,
         'project':      project,
         'stats':        stats,
@@ -254,11 +278,11 @@ def professor_project_work_view(request, project_id):
         'tasks':        tasks,
         'columns':      columns,
         'current_sort': sort,
-    }
-
-    return render(request, 'authentication/professor_work.html', context)
-
-
+        'q':            q,
+        'overdue_count':overdue_count,
+        'percent_done': percent_done,
+        'is_risky':     is_risky,
+    })
 
 def execute_query():
     with connection.cursor() as cursor:
