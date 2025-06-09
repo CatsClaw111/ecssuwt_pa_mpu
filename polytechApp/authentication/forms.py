@@ -44,6 +44,13 @@ class TaskForm(forms.ModelForm):
                 'type': 'date',
             }),
         }
+        labels = {
+            'title':       'Название задачи',
+            'description': 'Описание',
+            'executor':    'Исполнитель',
+            'deadline':    'Дедлайн',
+            'status':      'Статус',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
