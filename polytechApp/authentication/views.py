@@ -9,7 +9,7 @@ from django.db import connection
 from django.db.models import Count, Q
 from time import timezone
 from django.http import JsonResponse
-from django.core.exceptions import PermissionDenied
+from datetime import date, timedelta
 
 def login_view(request):
     next_url = request.GET.get('next', 'dashboard')
@@ -188,17 +188,40 @@ def task_create_report_view(request, task_id):
 
     return render(request, 'authentication/task_create_report.html', {'form': form, 'task': task})
 
+# authentication/views.py
+
+from datetime import date, timedelta
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
+
+from .models import Project, ProfProj
+
 @login_required
 def professor_project_work_view(request, project_id):
     professor = request.user.professor
     project = get_object_or_404(Project, id=project_id)
 
+    # Проверка доступа
     if not ProfProj.objects.filter(professor=professor, project=project).exists():
         return render(request, 'authentication/error.html', {
             'message': 'Проект не найден для данного преподавателя'
         })
 
-    # Настройки для сортировки
+    # === Виджет 1: статистика по задачам ===
+    stats = project.tasks.aggregate(
+        total=Count('id'),
+        pending=Count('id', filter=Q(status='pending')),
+        done=Count('id', filter=Q(status='completed')),
+    )
+
+    # === Виджет 2: ближайшие дедлайны (на неделю) ===
+    today = date.today()
+    upcoming = project.tasks.filter(
+        deadline__range=(today, today + timedelta(days=7))
+    ).order_by('deadline')[:5]
+
+    # === Основная таблица задач (сортировка) ===
     allowed = {
         'title':       'title',
         'description': 'description',
@@ -222,20 +245,16 @@ def professor_project_work_view(request, project_id):
         ('status',      'Статус'),
     ]
 
+    # Собираем контекст
     context = {
         'professor':    professor,
         'project':      project,
+        'stats':        stats,
+        'upcoming':     upcoming,
         'tasks':        tasks,
+        'columns':      columns,
         'current_sort': sort,
-        'columns': columns,
     }
-    
-    stats = project.tasks.aggregate(
-        total=Count('id'),
-        pending=Count('id', filter=Q(status='pending')),
-        done=Count('id', filter=Q(status='completed')),
-    )
-    context['stats'] = stats
 
     return render(request, 'authentication/professor_work.html', context)
 

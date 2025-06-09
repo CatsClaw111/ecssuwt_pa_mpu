@@ -206,6 +206,51 @@
     color: #777;
   }
 
+  .widget-upcoming {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .widget-upcoming h3 {
+    margin: 0 0 15px;
+    font-size: 18px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+  }
+  .upcoming-list {
+    list-style: decimal inside;
+    margin: 0 0 15px;
+    padding: 0;
+  }
+  .upcoming-list li {
+    margin-bottom: 10px;
+  }
+  .upcoming-list a {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .upcoming-list a:hover {
+    text-decoration: underline;
+  }
+  .upcoming-date {
+    float: right;
+    font-size: 14px;
+    color: #777;
+  }
+  .widget-link {
+    display: inline-block;
+    font-size: 14px;
+    color: #4a90e2;
+    text-decoration: none;
+  }
+  .widget-link:hover {
+    text-decoration: underline;
+  }
+
 </style>
 {% endblock %}
 
@@ -232,6 +277,20 @@
         <span class="stat-label">Завершено</span>
       </div>
     </div>
+  </div>
+
+  <div class="widget widget-upcoming">
+    <h3>Скоро сдавать</h3>
+    <ol class="upcoming-list">
+      {% for task in upcoming %}
+        <li>
+          <a href="{% url 'task_edit' task.id %}">{{ task.title }}</a>
+          <span class="upcoming-date">{{ task.deadline }}</span>
+        </li>
+      {% empty %}
+        <li>Нет задач с дедлайнами в ближайшие дни.</li>
+      {% endfor %}
+    </ol>
   </div>
 
 
